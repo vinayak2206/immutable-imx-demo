@@ -1,5 +1,7 @@
 # Immutable (IMX) Live Demo
 
+**Live demo: https://immutable-imx-demo.vercel.app/**
+
 An interactive, single-page demo that accompanies our FLCS #3 case study on **Immutable (IMX)** for *Principles of Blockchain Technology*. It turns the claims in the slides into something you can click.
 
 ## What it shows
@@ -47,9 +49,11 @@ immutable-imx-demo/
 └── .gitignore
 ```
 
-## Publish with GitHub Pages (optional)
+## Deployment
 
-Repo **Settings → Pages → Deploy from a branch → `main` / root**. The demo is then live at `https://<your-username>.github.io/<repo-name>/`.
+Deployed on Vercel: https://immutable-imx-demo.vercel.app/
+
+It is a static site with no build step, so any static host works.
 
 ## Data sources
 
