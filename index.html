@@ -1,0 +1,972 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Immutable (IMX) Live Demo v2</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="64x64" href="assets/favicon.png" />
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+    <style>
+      :root {
+        --bg: #0f0d1a;
+        --p: #17142a;
+        --p2: #1f1b38;
+        --ln: #2e2952;
+        --tx: #f3f1ff;
+        --mu: #a39fc4;
+        --vi: #8b6cff;
+        --mi: #2ee6c9;
+        --pk: #ff5c8d;
+        --am: #ffc857;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--tx);
+        font:
+          16px/1.45 "Segoe UI",
+          system-ui,
+          Arial,
+          sans-serif;
+      }
+      .wrap {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 20px 24px 36px;
+      }
+      header {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+      h1 {
+        font-size: 26px;
+        margin: 0;
+        font-weight: 700;
+      }
+      h1 span {
+        color: var(--mi);
+      }
+      .mu {
+        color: var(--mu);
+      }
+      .sm {
+        font-size: 13px;
+      }
+      button,
+      input,
+      select {
+        font: inherit;
+        color: var(--tx);
+        background: var(--p2);
+        border: 1px solid var(--ln);
+        border-radius: 8px;
+        padding: 8px 14px;
+      }
+      button {
+        cursor: pointer;
+      }
+      button:focus-visible,
+      input:focus-visible,
+      select:focus-visible {
+        outline: 2px solid var(--mi);
+      }
+      button.go {
+        background: var(--vi);
+        border-color: var(--vi);
+        font-weight: 700;
+        font-size: 17px;
+        padding: 11px 26px;
+      }
+      button:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+      nav {
+        display: flex;
+        gap: 6px;
+        margin: 16px 0;
+        border-bottom: 1px solid var(--ln);
+      }
+      nav button {
+        border: 0;
+        border-bottom: 3px solid transparent;
+        border-radius: 0;
+        background: none;
+        color: var(--mu);
+        font-size: 16px;
+        padding: 10px 18px;
+      }
+      nav button.on {
+        color: var(--tx);
+        border-bottom-color: var(--mi);
+      }
+      .pill {
+        font-size: 13px;
+        padding: 5px 12px;
+        border-radius: 99px;
+        background: var(--p);
+        border: 1px solid var(--ln);
+      }
+      .pill b {
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        margin-right: 7px;
+        background: var(--am);
+      }
+      .pill.live b {
+        background: var(--mi);
+      }
+      section {
+        display: none;
+      }
+      section.on {
+        display: block;
+      }
+      .card {
+        background: var(--p);
+        border: 1px solid var(--ln);
+        border-radius: 12px;
+        padding: 18px;
+      }
+      .g2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .g3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+      .g5 {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+      }
+      h2 {
+        font-size: 17px;
+        margin: 0 0 12px;
+      }
+      .row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: end;
+        margin-bottom: 14px;
+      }
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        color: var(--mu);
+        font-size: 13px;
+      }
+      input[type="number"] {
+        width: 120px;
+      }
+      .st {
+        background: var(--p);
+        border: 1px solid var(--ln);
+        border-radius: 12px;
+        padding: 14px;
+        transition: 0.3s;
+        min-height: 112px;
+      }
+      .st b {
+        display: block;
+        font-size: 17px;
+      }
+      .st small {
+        color: var(--mu);
+      }
+      .st.on {
+        border-color: var(--mi);
+        background: #16303a;
+      }
+      .st.done {
+        border-color: var(--vi);
+      }
+      .track {
+        height: 6px;
+        background: var(--ln);
+        border-radius: 3px;
+        position: relative;
+        margin: 20px 0 22px;
+      }
+      .pk {
+        position: absolute;
+        top: -7px;
+        left: 10%;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--mi);
+        transform: translateX(-50%);
+        transition: left 0.7s ease;
+      }
+      .big {
+        font-size: 34px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+      }
+      .log {
+        min-height: 150px;
+        font-size: 15px;
+      }
+      .log p {
+        margin: 0 0 9px;
+        padding-left: 12px;
+        border-left: 3px solid var(--vi);
+      }
+      .stat {
+        background: var(--p2);
+        border-radius: 10px;
+        padding: 12px;
+      }
+      .stat .l {
+        color: var(--mu);
+        font-size: 13px;
+      }
+      .stat .v {
+        font-size: 22px;
+        font-weight: 700;
+        margin-top: 2px;
+        font-variant-numeric: tabular-nums;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-variant-numeric: tabular-nums;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 8px 6px;
+        border-bottom: 1px solid var(--ln);
+        font-size: 14px;
+      }
+      th {
+        color: var(--mu);
+        font-weight: 500;
+      }
+      .r {
+        text-align: right;
+      }
+      .up {
+        color: var(--mi);
+      }
+      .down {
+        color: var(--pk);
+      }
+      .bar {
+        display: flex;
+        height: 28px;
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 6px 0 10px;
+      }
+      .lane {
+        height: 30px;
+        background: var(--p2);
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 6px 0 4px;
+      }
+      .lane div {
+        height: 100%;
+        width: 0;
+        background: var(--mi);
+        transition: width 2s linear;
+      }
+      .lane.eth div {
+        background: var(--pk);
+        transition-duration: 12s;
+      }
+      .flash {
+        animation: fl 1s;
+      }
+      @keyframes fl {
+        from {
+          background: #2ee6c933;
+        }
+        to {
+          background: transparent;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+          animation: none !important;
+        }
+      }
+      @media (max-width: 900px) {
+        .g2,
+        .g3,
+        .g5 {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div>
+          <h1>Immutable <span>(IMX)</span> live demo</h1>
+          <div class="mu sm">
+            FLCS #3 · Principles of Blockchain Technology · keys 1–4 switch
+            tabs, O toggles offline mode
+          </div>
+        </div>
+        <div class="row" style="margin: 0">
+          <span class="pill" id="pill"
+            ><b></b><span id="pt">Connecting…</span></span
+          ><button id="off">Offline mode: off</button>
+        </div>
+      </header>
+      <nav id="nav">
+        <button data-t="trade" class="on">1 · Make a trade</button
+        ><button data-t="chain">2 · Blocks &amp; sequencer</button
+        ><button data-t="fees">3 · Fees &amp; gas</button
+        ><button data-t="mkt">4 · Market &amp; liquidity</button>
+      </nav>
+
+      <section id="trade" class="on">
+        <div class="row">
+          <label
+            >NFT price (USD)<input
+              type="number"
+              id="p-price"
+              value="100"
+              min="1" /></label
+          ><button class="go" id="buy">Buy the NFT</button
+          ><span class="big" id="tm">0.0 s</span>
+        </div>
+        <div class="g5" id="stg"></div>
+        <div class="track"><div class="pk" id="pk"></div></div>
+        <div class="g2">
+          <div class="card">
+            <h2>What is happening</h2>
+            <div class="log" id="log">
+              <span class="mu"
+                >Press “Buy the NFT” to follow one trade from sign-in to
+                settlement.</span
+              >
+            </div>
+          </div>
+          <div class="card">
+            <h2>Result</h2>
+            <div id="res" class="mu">Waiting for a trade.</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="chain">
+        <div class="g3" style="margin-bottom: 16px">
+          <div class="stat">
+            <div class="l">Latest block</div>
+            <div class="v" id="n-b">–</div>
+          </div>
+          <div class="stat">
+            <div class="l">Average block time</div>
+            <div class="v" id="n-bt">–</div>
+          </div>
+          <div class="stat">
+            <div class="l">All-time transactions / addresses</div>
+            <div class="v" id="n-tx">–</div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom: 16px">
+          <div class="mu sm">Centralization check</div>
+          <div class="big" id="seq">–</div>
+          <div class="mu sm" id="seq2"></div>
+        </div>
+        <div class="card">
+          <h2>Live block feed <span class="mu sm" id="src"></span></h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Block</th>
+                <th class="r">Txs</th>
+                <th class="r">Gas used</th>
+                <th>Produced by</th>
+                <th class="r">Age</th>
+              </tr>
+            </thead>
+            <tbody id="blk"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="fees">
+        <div class="g2">
+          <div class="card">
+            <h2>Who gets the money from an NFT sale</h2>
+            <div class="row">
+              <label
+                >Price (USD)<input type="number" id="f-p" value="100" /></label
+              ><label
+                >Royalty %<input
+                  type="number"
+                  id="f-r"
+                  value="5"
+                  step=".5"
+                  style="width: 80px" /></label
+              ><label
+                >Marketplace %<input
+                  type="number"
+                  id="f-m"
+                  value="1"
+                  step=".5"
+                  style="width: 80px"
+              /></label>
+            </div>
+            <div class="bar" id="f-bar"></div>
+            <table id="f-t"></table>
+            <div class="mu sm" style="margin-top: 8px">
+              Protocol fee is fixed at 2%. Green: seller · violet: royalty ·
+              pink: Immutable · amber: marketplace.
+            </div>
+          </div>
+          <div class="card">
+            <h2>Gas race: same trade, two chains</h2>
+            <div class="row">
+              <label
+                >Gas units<input
+                  type="number"
+                  id="f-g"
+                  value="200000"
+                  step="10000" /></label
+              ><button class="go" id="race">Start race</button>
+            </div>
+            <div>Immutable Chain <span class="mu sm" id="c-i"></span></div>
+            <div class="lane"><div id="l-i"></div></div>
+            <div>Ethereum L1 <span class="mu sm" id="c-e"></span></div>
+            <div class="lane eth"><div id="l-e"></div></div>
+            <div class="mu sm" id="race-r" style="margin-top: 8px">
+              Real block times: about 2 s vs about 12 s. Passport players pay $0
+              because gas is sponsored.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="mkt">
+        <div class="g5" id="kpi" style="margin-bottom: 16px"></div>
+        <div class="g2">
+          <div class="card">
+            <h2>IMX pools on DEXs</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>DEX</th>
+                  <th>Pair</th>
+                  <th class="r">Liquidity</th>
+                </tr>
+              </thead>
+              <tbody id="pools"></tbody>
+            </table>
+          </div>
+          <div class="card">
+            <h2>Sell IMX: how far does the price move?</h2>
+            <div class="row">
+              <label>Pool<select id="s-pool"></select></label
+              ><label
+                >Sell IMX<input
+                  type="number"
+                  id="s-amt"
+                  value="100000"
+                  step="10000"
+              /></label>
+            </div>
+            <div class="g2" style="margin-bottom: 10px">
+              <div class="stat">
+                <div class="l">You receive</div>
+                <div class="v" id="s-out">–</div>
+              </div>
+              <div class="stat">
+                <div class="l">Price impact</div>
+                <div class="v" id="s-imp">–</div>
+              </div>
+            </div>
+            <svg id="curve" viewBox="0 0 420 150" width="100%"></svg>
+            <div class="mu sm">
+              Constant-product estimate (x·y = k) from live reserves. V3 pools
+              differ, so this is an approximation. Dot = your sell size.
+            </div>
+          </div>
+        </div>
+      </section>
+      <p class="mu sm" style="margin-top: 22px">
+        Sources: CoinGecko, rpc.immutable.com, explorer.immutable.com,
+        DexScreener, public Ethereum RPC. If a source fails, the demo uses a 15
+        Nov 2026 snapshot (amber dot). Educational demo, not financial advice.
+      </p>
+    </div>
+    <script>
+      const SNAP = {
+        coin: {
+          price: 0.0993,
+          mcap: 89868942,
+          vol: 7661672,
+          ch1y: -74.09,
+          ath: 9.52,
+        },
+        ethP: 1813.84,
+        ethGas: 0.28,
+        imxGas: 10.98,
+        blk: 46234945,
+        txs: 245741855,
+        addr: 31762624,
+        pools: [
+          {
+            dexId: "uniswap",
+            baseToken: { symbol: "IMX" },
+            quoteToken: { symbol: "WETH" },
+            priceUsd: "0.1005",
+            liquidity: { usd: 61867, base: 552912, quote: 3.4595 },
+          },
+          {
+            dexId: "sushiswap",
+            baseToken: { symbol: "IMX" },
+            quoteToken: { symbol: "WETH" },
+            priceUsd: "0.1005",
+            liquidity: { usd: 32084, base: 286740, quote: 1.794 },
+          },
+          {
+            dexId: "uniswap",
+            baseToken: { symbol: "IMX" },
+            quoteToken: { symbol: "WETH" },
+            priceUsd: "0.1005",
+            liquidity: { usd: 14508, base: 129660, quote: 0.811 },
+          },
+        ],
+      };
+      const IMX = "0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF",
+        IR = "https://rpc.immutable.com",
+        EX = "https://explorer.immutable.com/api/v2";
+      const S = {
+        coin: SNAP.coin,
+        ethP: SNAP.ethP,
+        ethGas: SNAP.ethGas,
+        imxGas: SNAP.imxGas,
+        pools: SNAP.pools,
+        off: false,
+        live: false,
+        tot: {},
+      };
+      const $ = (i) => document.getElementById(i),
+        sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+      const usd = (v, d = 2) =>
+        "$" +
+        Number(v).toLocaleString("en-US", {
+          minimumFractionDigits: d,
+          maximumFractionDigits: d,
+        });
+      const big = (v) => {
+        const a = Math.abs(v);
+        return a >= 1e9
+          ? (v / 1e9).toFixed(2) + "B"
+          : a >= 1e6
+            ? (v / 1e6).toFixed(2) + "M"
+            : a >= 1e3
+              ? (v / 1e3).toFixed(1) + "K"
+              : v.toFixed(2);
+      };
+      const short = (h) => (h ? h.slice(0, 6) + "…" + h.slice(-4) : "–");
+      async function jget(u, o = {}) {
+        const c = new AbortController(),
+          t = setTimeout(() => c.abort(), 8000);
+        try {
+          const r = await fetch(u, { ...o, signal: c.signal });
+          if (!r.ok) throw 0;
+          return await r.json();
+        } finally {
+          clearTimeout(t);
+        }
+      }
+      const rpc = (m, p = []) =>
+        jget(IR, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: m, params: p }),
+        }).then((j) => j.result);
+      function pill() {
+        $("pill").className = "pill" + (S.live && !S.off ? " live" : "");
+        $("pt").textContent = S.off
+          ? "Offline mode (snapshot 15 Nov 2026)"
+          : S.live
+            ? "Live data"
+            : "Snapshot 15 Nov 2026";
+      }
+
+      /* tabs */
+      function tab(t) {
+        document
+          .querySelectorAll("section")
+          .forEach((s) => s.classList.toggle("on", s.id === t));
+        document
+          .querySelectorAll("nav button")
+          .forEach((b) => b.classList.toggle("on", b.dataset.t === t));
+      }
+      $("nav").onclick = (e) => e.target.dataset.t && tab(e.target.dataset.t);
+      document.addEventListener("keydown", (e) => {
+        if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT")
+          return;
+        const k = e.key.toLowerCase(),
+          m = { 1: "trade", 2: "chain", 3: "fees", 4: "mkt" };
+        if (m[k]) tab(m[k]);
+        if (k === "o") $("off").click();
+      });
+      $("off").onclick = () => {
+        S.off = !S.off;
+        $("off").textContent = "Offline mode: " + (S.off ? "on" : "off");
+        pill();
+        if (!S.off) refresh();
+      };
+
+      /* 1. trade walkthrough */
+      const STEPS = [
+        [
+          "Passport sign-in",
+          "Player signs in with Google. Passport creates a wallet, with no seed phrase.",
+          900,
+        ],
+        [
+          "Game mints NFT",
+          "The game mints the item as an NFT. Gas is sponsored, so the player pays $0.",
+          1000,
+        ],
+        [
+          "Orderbook match",
+          "Buyer and seller are matched in the shared orderbook that every marketplace uses.",
+          1100,
+        ],
+        [
+          "Sequencer",
+          "The single sequencer puts the trade into the next block, about 2 seconds.",
+          2000,
+        ],
+        [
+          "Ethereum settlement",
+          "The chain state is anchored to Ethereum, which provides the security.",
+          1300,
+        ],
+      ];
+      $("stg").innerHTML = STEPS.map(
+        (s, i) =>
+          `<div class="st"><b>${i + 1}. ${s[0]}</b><small>${s[1].split(".")[0]}.</small></div>`,
+      ).join("");
+      let busy = false;
+      $("buy").onclick = async () => {
+        if (busy) return;
+        busy = true;
+        $("buy").disabled = true;
+        const P = +$("p-price").value || 100,
+          st = [...$("stg").children];
+        st.forEach((x) => (x.className = "st"));
+        $("log").innerHTML = "";
+        $("res").innerHTML = "Trade in progress…";
+        const t0 = performance.now(),
+          iv = setInterval(
+            () =>
+              ($("tm").textContent =
+                ((performance.now() - t0) / 1000).toFixed(1) + " s"),
+            100,
+          );
+        for (let i = 0; i < STEPS.length; i++) {
+          st[i].classList.add("on");
+          $("pk").style.left = 10 + i * 20 + "%";
+          let t = STEPS[i][1];
+          if (i === 2)
+            t += ` Fees on ${usd(P)}: royalty ${usd(P * 0.05)}, protocol ${usd(P * 0.02)}, marketplace ${usd(P * 0.01)}.`;
+          $("log").insertAdjacentHTML(
+            "beforeend",
+            `<p><b>${STEPS[i][0]}.</b> ${t}</p>`,
+          );
+          await sleep(STEPS[i][2]);
+          st[i].classList.replace("on", "done");
+        }
+        clearInterval(iv);
+        const T = (performance.now() - t0) / 1000;
+        $("tm").textContent = T.toFixed(1) + " s";
+        const gasE = 2e5 * S.ethGas * 1e-9 * S.ethP;
+        $("res").innerHTML =
+          `<div class="big up">${usd(P * 0.92)}</div><div>goes to the seller. Gas for the player: <b>$0</b> (sponsored). On Ethereum L1 this trade’s gas alone would be about <b>${usd(gasE)}</b>.</div><div class="mu sm" style="margin-top:8px">Walkthrough timing is simulated; the 2 s block time and fees are real.</div>`;
+        busy = false;
+        $("buy").disabled = false;
+      };
+
+      /* 2. blocks & sequencer */
+      const B = [];
+      let polling = false;
+      async function poll() {
+        if (polling) return;
+        polling = true;
+        let b;
+        try {
+          if (S.off) throw 0;
+          const r = await rpc("eth_getBlockByNumber", ["latest", false]);
+          b = {
+            n: parseInt(r.number, 16),
+            tx: r.transactions.length,
+            gu: parseInt(r.gasUsed, 16),
+            m: r.miner,
+            ts: parseInt(r.timestamp, 16) * 1000,
+          };
+          S.live = true;
+          $("src").textContent = "live from rpc.immutable.com";
+        } catch (e) {
+          const n = (B[0]?.n || SNAP.blk) + 1;
+          b = {
+            n,
+            tx: Math.floor(Math.random() * 7),
+            gu: Math.floor(Math.random() * 4e5),
+            m: "0x0000000000000000000000000000000000000000",
+            ts: Date.now(),
+            sim: 1,
+          };
+          $("src").textContent = "simulated (offline)";
+        }
+        if (!B[0] || B[0].n !== b.n) {
+          B.unshift(b);
+          B.length = Math.min(B.length, 40);
+          S.tot[b.m] = (S.tot[b.m] || 0) + 1;
+          draw();
+        }
+        pill();
+        polling = false;
+      }
+      function draw() {
+        const tot = Object.values(S.tot).reduce((a, c) => a + c, 0),
+          [m, c] = Object.entries(S.tot).sort((a, b) => b[1] - a[1])[0];
+        $("seq").textContent = `${c} of ${tot} blocks`;
+        $("seq").className = "big " + (c === tot ? "down" : "up");
+        $("seq2").textContent =
+          `produced by ${short(m)} since you opened this page. One producer means one point of control.`;
+        $("n-b").textContent = B[0].n.toLocaleString();
+        if (B.length > 2) {
+          const d = (B[0].ts - B[B.length - 1].ts) / (B.length - 1) / 1000;
+          $("n-bt").textContent = B[0].sim ? "2.00 s" : d.toFixed(2) + " s";
+        }
+        $("blk").innerHTML = B.slice(0, 8)
+          .map(
+            (x, i) =>
+              `<tr class="${i ? "" : "flash"}"><td>#${x.n.toLocaleString()}</td><td class="r">${x.tx}</td><td class="r">${big(x.gu)}</td><td>${short(x.m)}</td><td class="r">${Math.max(0, Math.round((Date.now() - x.ts) / 1000))}s</td></tr>`,
+          )
+          .join("");
+      }
+      setInterval(poll, 2000);
+
+      /* 3. fees & gas */
+      function fees() {
+        const P = +$("f-p").value || 0,
+          r = (+$("f-r").value || 0) / 100,
+          m = (+$("f-m").value || 0) / 100,
+          v = [
+            [
+              "Seller receives",
+              Math.max(0, P * (1 - r - m - 0.02)),
+              "var(--mi)",
+            ],
+            ["Creator royalty", P * r, "var(--vi)"],
+            ["Immutable protocol fee (2%)", P * 0.02, "var(--pk)"],
+            ["Marketplace fee", P * m, "var(--am)"],
+          ];
+        $("f-bar").innerHTML = v
+          .map((x) =>
+            P
+              ? `<div style="width:${(x[1] / P) * 100}%;background:${x[2]}"></div>`
+              : "",
+          )
+          .join("");
+        $("f-t").innerHTML =
+          `<tr><td>Buyer pays</td><td class="r">${usd(P)}</td></tr>` +
+          v
+            .map(
+              (x) => `<tr><td>${x[0]}</td><td class="r">${usd(x[1])}</td></tr>`,
+            )
+            .join("");
+        const g = +$("f-g").value || 0,
+          ci = g * S.imxGas * 1e-9 * S.coin.price,
+          ce = g * S.ethGas * 1e-9 * S.ethP;
+        $("c-i").textContent =
+          "gas " + (ci < 0.01 ? "under $0.01" : usd(ci, 3)) + " · 2 s";
+        $("c-e").textContent = "gas " + usd(ce) + " · 12 s";
+      }
+      ["f-p", "f-r", "f-m", "f-g"].forEach((i) => ($(i).oninput = fees));
+      $("race").onclick = async () => {
+        const a = $("l-i"),
+          b = $("l-e");
+        [a, b].forEach((x) => {
+          x.style.transition = "none";
+          x.style.width = "0";
+        });
+        void a.offsetWidth;
+        [a, b].forEach((x) => (x.style.transition = ""));
+        a.style.width = b.style.width = "100%";
+        $("race").disabled = true;
+        $("race-r").textContent = "Racing…";
+        await sleep(2100);
+        $("race-r").textContent =
+          "Immutable confirmed in about 2 s. Ethereum is still waiting for its block…";
+        await sleep(10000);
+        $("race-r").textContent =
+          "Ethereum confirmed after about 12 s, and the gas cost far more. Passport players on Immutable pay $0.";
+        $("race").disabled = false;
+      };
+
+      /* 4. market & liquidity */
+      function kpi() {
+        const c = S.coin,
+          K = [
+            ["IMX price", "$" + c.price.toFixed(4)],
+            ["Market cap", "$" + big(c.mcap)],
+            ["24h volume", "$" + big(c.vol)],
+            [
+              "1-year change",
+              `<span class="${c.ch1y < 0 ? "down" : "up"}">${c.ch1y.toFixed(1)}%</span>`,
+            ],
+            [
+              "All-time high",
+              usd(c.ath) +
+                ` <span class="down sm">${((1 - c.price / c.ath) * 100).toFixed(1)}% below</span>`,
+            ],
+          ];
+        $("kpi").innerHTML = K.map(
+          (k) =>
+            `<div class="stat"><div class="l">${k[0]}</div><div class="v">${k[1]}</div></div>`,
+        ).join("");
+      }
+      function pools() {
+        $("pools").innerHTML = S.pools
+          .map(
+            (p) =>
+              `<tr><td>${p.dexId}</td><td>${p.baseToken.symbol}/${p.quoteToken.symbol}</td><td class="r">$${big(p.liquidity.usd)}</td></tr>`,
+          )
+          .join("");
+        const cur = $("s-pool").value;
+        $("s-pool").innerHTML = S.pools
+          .map(
+            (p, i) =>
+              `<option value="${i}">${p.dexId} ($${big(p.liquidity.usd)})</option>`,
+          )
+          .join("");
+        if (cur) $("s-pool").value = cur;
+        swap();
+      }
+      function swap() {
+        const p = S.pools[+$("s-pool").value || 0];
+        if (!p) return;
+        const isB = ["IMX", "WIMX"].includes(p.baseToken.symbol.toUpperCase()),
+          x = isB ? p.liquidity.base : p.liquidity.quote,
+          y = isB ? p.liquidity.quote : p.liquidity.base;
+        const imp = (d) => {
+            const f = d * 0.997,
+              o = (y * f) / (x + f);
+            return 1 - o / d / (y / x);
+          },
+          dx = +$("s-amt").value || 0,
+          im = imp(dx),
+          usdIn = dx * (+p.priceUsd || S.coin.price);
+        $("s-out").textContent = "≈ " + usd(usdIn * (1 - im));
+        $("s-imp").innerHTML =
+          `<span class="${im > 0.05 ? "down" : "up"}">${(im * 100).toFixed(2)}%</span>`;
+        const Z = [1e3, 5e3, 1e4, 5e4, 1e5, 2.5e5, 5e5, 1e6],
+          X = (d) => 30 + ((Math.log10(d) - 3) / 3) * 370,
+          Y = (v) => 130 - Math.min(v, 1) * 115;
+        $("curve").innerHTML =
+          `<line x1="30" x2="410" y1="130" y2="130" stroke="#2E2952"/><polyline fill="none" stroke="#FF5C8D" stroke-width="2.5" points="${Z.map((d) => X(d) + "," + Y(imp(d))).join(" ")}"/>` +
+          Z.map(
+            (d) =>
+              `<text x="${X(d)}" y="146" text-anchor="middle" fill="#A39FC4" font-size="10">${big(d).replace(".00", "")}</text>`,
+          ).join("") +
+          `<text x="4" y="22" fill="#A39FC4" font-size="10">impact</text><circle cx="${X(Math.max(1e3, Math.min(dx, 1e6)))}" cy="${Y(im)}" r="6" fill="#2EE6C9"/>`;
+      }
+      $("s-pool").oninput = $("s-amt").oninput = swap;
+
+      /* data refresh */
+      async function refresh() {
+        if (S.off) {
+          S.coin = SNAP.coin;
+          S.pools = SNAP.pools;
+          kpi();
+          pools();
+          fees();
+          pill();
+          return;
+        }
+        const T = [
+          jget(
+            "https://api.coingecko.com/api/v3/coins/immutable-x?localization=false&tickers=false&community_data=false&developer_data=false&sparkline=false",
+          ).then((j) => {
+            const m = j.market_data;
+            S.coin = {
+              price: m.current_price.usd,
+              mcap: m.market_cap.usd,
+              vol: m.total_volume.usd,
+              ch1y: m.price_change_percentage_1y,
+              ath: m.ath.usd,
+            };
+            S.live = true;
+          }),
+          jget(
+            "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd",
+          ).then((j) => (S.ethP = j.ethereum.usd)),
+          rpc("eth_gasPrice").then((h) => (S.imxGas = parseInt(h, 16) / 1e9)),
+          jget("https://ethereum-rpc.publicnode.com", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+              jsonrpc: "2.0",
+              id: 1,
+              method: "eth_gasPrice",
+              params: [],
+            }),
+          }).then((j) => (S.ethGas = parseInt(j.result, 16) / 1e9)),
+          jget(EX + "/stats").then((s) => {
+            $("n-tx").textContent =
+              big(+s.total_transactions) + " / " + big(+s.total_addresses);
+            S.live = true;
+          }),
+          jget(
+            "https://api.dexscreener.com/token-pairs/v1/ethereum/" + IMX,
+          ).then((a) => {
+            const p = a
+              .filter(
+                (x) =>
+                  x.liquidity?.usd > 0 &&
+                  x.liquidity.base &&
+                  [x.baseToken.address, x.quoteToken.address].some(
+                    (d) => d.toLowerCase() === IMX.toLowerCase(),
+                  ),
+              )
+              .sort((x, y) => y.liquidity.usd - x.liquidity.usd)
+              .slice(0, 6);
+            if (p.length) S.pools = p;
+          }),
+        ];
+        await Promise.allSettled(T);
+        if ($("n-tx").textContent === "–")
+          $("n-tx").textContent = big(SNAP.txs) + " / " + big(SNAP.addr);
+        kpi();
+        pools();
+        fees();
+        pill();
+      }
+      $("n-tx").textContent = "–";
+      refresh();
+      poll();
+      setInterval(() => !S.off && refresh(), 60000);
+    </script>
+  </body>
+</html>
